@@ -11,5 +11,35 @@ def JudegFlu(text):
     input one text
     return 0 : not flu related ,1 : flu related
     '''
-    flu_words = ['influenza']
-    pass
+    text =text.lower()    
+
+    def WordsIn(words,sentence):
+        for w in words:
+            if w in sentence:
+                pass
+            else:
+                return False
+        return True
+    
+    flu_words = ['influenza','flu','fever',
+    'cough',('sore' ,'throat'),('catch','cold'),('sick','cold'),('week','cold'),
+    'infect',('cold','ill'),('cold','illness'),('viruses','cold'),('vaccine','cold'),
+    ('cold','hospital'),('cold','headache'),('runny','nose'),('cold','medicine'),
+    ('cold','infections')]
+    #text2words = text.strip().split(' ')
+    for fw in flu_words:
+        if isinstance(fw,tuple):
+            if WordsIn(fw,text):
+                print 'tuple'
+                print text
+                return 1
+            else:
+                return 0
+        else:
+            if fw in text:
+                return 1
+            else:
+                0
+                
+                
+                
