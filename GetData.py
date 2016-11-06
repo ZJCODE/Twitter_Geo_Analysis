@@ -11,7 +11,7 @@ def getData(with_geo_tag = True):
           
     if with_geo_tag == True :
         SELECT_QUERY="""
-        SELECT uid,latitude, longitude,location_name, text , created_at 
+        SELECT uid,latitude, longitude, text , created_at 
         FROM aussie_tweets 
         where has_geotag=true 
         ORDER BY created_at
@@ -34,7 +34,7 @@ def getData(with_geo_tag = True):
         print "Error ocurred: %s " % e.args[0]
         print e
       
-    Data = pd.DataFrame(X,columns=['uid','latitude', 'longitude', 'location_name','text' , 'created_at'])
+    Data = pd.DataFrame(X,columns=['uid','latitude', 'longitude','text' , 'created_at'])
     return Data
     
     
@@ -67,4 +67,13 @@ def getIdNameDict():
     IdNameDict = dict(IdNameList)
     return IdNameDict
 
+PosData = pd.read_csv('./Data/PosData.csv')
 
+def AddPos(Data,PosData):
+    Data['Location'] = PosData.Location
+    Data['District'] = PosData.District
+    Data = Data.dropna(how='any')
+    location_name = [loc+','+dis for loc,dis in zip(Data.Location,Data.District)]
+    Data['location_name'] = location_name
+    
+        

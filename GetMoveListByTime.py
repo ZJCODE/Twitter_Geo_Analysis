@@ -62,15 +62,16 @@ def GetUserMovePositionList(u_data):
             move_time_list.append(time[i])
             i=i+1
             j=j+1
-    return move_position_list,move_time_list
+    u_date_names = list(set(u_data.user_name))*len(move_position_list)
+    return move_position_list,move_time_list,u_date_names
 
 # p,t = GetMovePositionList(GetUserData(Data,Data.user_name[23459])) 
  
-def MoveDirectionWithTime(move_position_list,move_time_list):
+def MoveDirectionWithTime(move_position_list,move_time_list,u_date_names):
     '''
     where to where and when
     '''
-    return [[(move_position_list[i],move_position_list[i+1]),move_time_list[i+1].date()] for i in range(len(move_position_list)-1)]
+    return [[(u_date_names[i],move_position_list[i],move_position_list[i+1]),move_time_list[i+1].date()] for i in range(len(move_position_list)-1)]
 
 # MoveDirectionWithTime(p,t)
 # MoveDirectionWithTime(*GetMovePositionList(GetUserData(Data,Data.user_name[23459])))
@@ -118,8 +119,9 @@ def GetAllMove_FasterVersion(Data):
             start = i
             t2 = time.time()
             print '======user ' + str(users_index) + ' is finished '+ 'cost ' + str(t2-t1) + ' seconds====='
-    move_list.sort(key= lambda x : x[1])        
-    return move_list
+    move_list.sort(key= lambda x : x[1])     
+    df_move_list = pd.DataFrame(move_list,columns = ['pair','time'])
+    return df_move_list
             
             
 
@@ -135,35 +137,7 @@ def GenerateDate(year,month,day):
     
 def GetDateData(Data,date):
     return Data[Data.date == date]
-  
 
-def DeleteMoveListException(move_list):
-    
-    '''
-    remove some exception
-    like None 
-    or some pairs with different description but actually the same place in where to where
-    '''
-    
-    df_move_list = pd.DataFrame(move_list,columns = ['pair','time'])
-    flag = []
-    for pair in df_move_list.pair:
-        if pair[0] == None or pair[1] == None:
-            flag.append(np.nan)
-        else:            
-            try:            
-                p_1_1 , p_1_2 = [a.strip() for a in pair[0].split(',')]
-                p_2_1 , p_2_2 = [a.strip() for a in pair[1].split(',')]
-                if p_1_1 == p_2_2 or p_1_2 == p_2_1:
-                    flag.append(np.nan)
-                else:
-                    flag.append(1)
-            except:
-                flag.append(1)
-    df_move_list['flag'] = flag
-    df_move_list_without_exception = df_move_list.dropna()[['pair','time']]
-    df_move_list_without_exception.index = range(len(df_move_list_without_exception))
-    return df_move_list_without_exception
 
 def AggMoveListByTime(move_list,way = 'week'):
     
@@ -221,7 +195,8 @@ def main():
     Data = getData()
     AddDate(Data)
     AddUserName(Data) 
-    move_list = DeleteMoveListException(GetAllMove_FasterVersion(Data))
+    #move_list = DeleteMoveListException(GetAllMove_FasterVersion(Data))
+    move_list = GetAllMove_FasterVersion(Data)
     day_m = AggMoveListByTime(move_list,way='day')
     week_m = AggMoveListByTime(move_list,way='week')
     month_m = AggMoveListByTime(move_list,way='month')
