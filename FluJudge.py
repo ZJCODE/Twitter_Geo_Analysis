@@ -26,17 +26,18 @@ def JudegFlu(text):
     'infect',('cold','ill'),('cold','illness'),('viruses','cold'),('vaccine','cold'),
     ('cold','hospital'),('cold','headache'),('runny','nose'),('cold','medicine'),
     ('cold','infections')]
-    #text2words = text.strip().split(' ')
+    text2words = text.strip().split(' ')
     for fw in flu_words:
         if isinstance(fw,tuple):
-            if WordsIn(fw,text):
+            if WordsIn(fw,text2words):
                 print 'tuple'
                 print text
                 return 1
             else:
                 return 0
         else:
-            if fw in text:
+            if fw in text2words:
+                print text
                 return 1
             else:
                 0

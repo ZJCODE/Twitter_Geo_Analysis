@@ -32,15 +32,7 @@ def GenerateDate(year,month,day):
     return pd.datetime(year,month,day).date()
 
 
-def SelectRelation(relation,weight):
-    c = Counter(relation)
-    sort_c = Sort_Dict(c)
-    select_sort_c = [a for a in sort_c if a[1] > weight]
-    edge_with_weight = [(a[0][0],a[0][1],a[1]) for a in select_sort_c]
-    return edge_with_weight
 
- 
-   
 def ExportEdgesToGephi(relation):    
     R = pd.DataFrame(relation,columns=['Source','Target'])
     R.to_csv('edges.csv',index=False)
@@ -50,11 +42,17 @@ def ExportNodeCategoryToGephi(nodes_category):
 
 
 
-def GetRelationInWhere(relation,place):
+def GetMoveInWhere(Move,place):
     '''
     specific location's place
     '''
-    return [a for a in relation if (place in a[0] and place in a[1])]
+    MoveInWhere = [a for a in Move if (place in a[1] and place in a[2])]
+    users = [a[0] for a in MoveInWhere]
+    pairs = [[a[1],a[2]] for a in MoveInWhere]
+    DfMove = pd.DataFrame({'user':users,'pairs':pairs})
+    return DfMove
+
+
 
 def GetRelationNamePart(relation):
     '''
