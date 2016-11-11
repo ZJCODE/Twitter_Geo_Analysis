@@ -54,25 +54,32 @@ def GetMoveInWhere(Move,place):
 
 
 
-def GetRelationNamePart(relation):
-    '''
-    return first part of place's name
-    '''
-    relation2 = []
-    for pair in relation:
-        try:            
-            p_1_1 , p_1_2 = [a.strip() for a in pair[0].split(',')]
-            p_2_1 , p_2_2 = [a.strip() for a in pair[1].split(',')]
-            relation2.append((p_1_1,p_2_1))
-        except:
-            pass
-    return relation2
+def FliterFlu(week_move,week_user_flu_state,where):
     
-    
+    weeks = sorted(week_move.keys())
+    flu_pair = []
+    actual_day_list = []
+    for w in weeks:
+        move = week_move[w]
+        MoveSomeWhere = GetMoveInWhere(move,where)
+        flu_state = week_user_flu_state[w]
+        flu_users = flu_state[0]
+        actual_day_list.append(flu_state[1])
+        Judge = [1 if user in flu_users else 0 for user in MoveSomeWhere.user]
+        MoveSomeWhere['Judge'] = Judge
+        flu_related_data = MoveSomeWhere[MoveSomeWhere.Judge==1]
+        flu_pair.append(flu_related_data.pairs.values)
+    return dict(zip(weeks,flu_pair)),actual_day_list
+   
+
+a,days = FliterFlu(week_move,week_user_flu_state,'Queensland')
+l = np.array([len(m) for m in a.values()])    
+actual_l = l*1.0/np.array(days)
+plt.plot(weeks,actual_l)
     
 def TestWeekMovePattern(y=2015,m=1,d=13):    
     week_move = Import_Obj('./Data/week_move')
-    relation = GetRelationNamePart(week_move[GenerateDate(y,m,d)])
+    relation = []
     G = GenerateNetwork(relation,direct = True)
     SubG = GetCoreSubNetwork(G,0,100,'No')
     n,e = CommunityDetection(SubG,3,with_label=True,with_arrow=True)

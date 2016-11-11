@@ -44,7 +44,7 @@ def AddDate(Data):
     d = [d.date() for d in Data.created_at]
     Data['date'] = d
 
-def JudegFlu(text):
+def JudegFlu(text):  # Need to be improved
     '''
     input one text
     return 0 : not flu related ,1 : flu related
@@ -64,7 +64,9 @@ def JudegFlu(text):
     'infect',('cold','ill'),('cold','illness'),('viruses','cold'),('vaccine','cold'),
     ('cold','hospital'),('cold','headache'),('runny','nose'),('cold','medicine'),
     ('cold','infections')]
+    
     text2words = text.strip().split(' ')
+    
     for fw in flu_words:
         if isinstance(fw,tuple):
             if WordsIn(fw,text2words):
@@ -83,8 +85,6 @@ def JudegFlu(text):
 def AddJudgeFlu(Data):
     Judge = [JudegFlu(text) for text in Data.text]
     Data['Judge'] = Judge    
-
-data_text = GetDataText()
 
 
 def UserFluStataByTime(data_text,way = 'week'):    
@@ -110,11 +110,11 @@ def UserFluStataByTime(data_text,way = 'week'):
             data = data_text[(data_text.date > date_start)&(data_text.date <= date_end)]
             actual_day.append(len(set(data.date)))
             flu_data = data[data.Judge == 1]
-            flu_user.append(list(set(flu_data.user_name)))
+            flu_user.append(list(set(flu_data.user_name)))  # Counter 
             t.append(date_start + timedelta(1))
             date_start = date_end
             date_end = date_start + day_7
-        flu_user_and_days = zip(flu_user,actual_day)
+        flu_user_and_days = zip(flu_user,actual_day)  # some day missing
         return dict(zip(t,flu_user_and_days))
         
     elif way == 'day':
@@ -142,5 +142,10 @@ def UserFluStataByTime(data_text,way = 'week'):
         return dict(zip(t,flu_user_and_days))    
     else:
         print 'Input Error Way'
-        
+   
+
+data_text = GetDataText()
+week_user_flu_state = UserFluStataByTime(data_text,'week')
+Save_Obj(week_user_flu_state,'week_user_flu_state')
+     
         
