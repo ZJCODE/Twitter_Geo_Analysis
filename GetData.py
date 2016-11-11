@@ -47,7 +47,6 @@ def getIdNameDict():
     SELECT_QUERY="""
     SELECT usr,uid,created_at 
     FROM aussie_tweets 
-    where has_geotag=true 
     ORDER BY created_at
     """
 
@@ -59,7 +58,7 @@ def getIdNameDict():
         print "Error ocurred: %s " % e.args[0]
         print e    
     
-    Data = pd.DataFrame(X,columns=['usr','uid', 'created_at','location_name'])
+    Data = pd.DataFrame(X,columns=['usr','uid', 'created_at'])
     user_name = [str.lower(str(u[-9])) for u in Data.usr]
     Data['user_name'] = user_name
     IdName = zip(Data.uid.values,Data.user_name.values)    
@@ -67,7 +66,7 @@ def getIdNameDict():
     IdNameDict = dict(IdNameList)
     return IdNameDict
 
-PosData = pd.read_csv('./Data/PosData.csv')
+#PosData = pd.read_csv('./Data/PosData.csv')
 
 def AddPos(Data,PosData):
     Data['Location'] = PosData.Location
