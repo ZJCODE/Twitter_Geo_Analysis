@@ -5,16 +5,11 @@ Created on Mon Nov 14 18:01:33 2016
 @author: ZJun
 """
 
-from GetData import LoadData
 import numpy as np
 import pandas as pd
 from datetime import timedelta
-from twitter_function import MapLocation,AddJudgeFlu
+from twitter_function import MapLocation,AddJudgeFlu,GenerateDate
 
-Data = LoadData()
-
-def GetActuallDayInWeek():
-    pass
     
 
 def GetTwitterInPlaceLoc(Data,place = None ,location = None):
@@ -53,13 +48,7 @@ def GetFluRelatedTwitterInPlaceLoc(Data,place,location):
     ts_flu_related_twitter_in_place_loc = pd.Series(week_ts.values,index= weeks)
     return ts_flu_related_twitter_in_place_loc
 
-'''
-tt = GetFluRelatedTwitterInPlaceLoc(Data,'Queensland','Brisbane')
-t = GetTwitterInPlaceLoc(Data,'Queensland','Brisbane')    
-t.plot()
-(a*20).plot()
-#(tt*2000).plot()    
-'''
+
 
     
 def GetMoveInPlace(Move,place):
@@ -94,8 +83,43 @@ def GetMoveDestinationInPlaceLoc(week_move,place,location):
 
     
 
-def GetFluRelatedMoveDestinationInPlaceLoc(place,location):
+def GetFluRelatedMoveDestinationInPlaceLoc(week_move,week_user_flu_state,place,location):
     '''
     return timeseries
     '''
-    pass
+    weeks = sorted(week_move.keys())
+    count = []
+    for w in weeks:
+        move = week_move[w]
+        move_in_place = GetMoveInPlace(move,place)
+        flu_state = week_user_flu_state[w]
+        flu_users = flu_state[0]
+        Judge = [1 if user in flu_users else 0 for user in move_in_place.user]
+        move_in_place['Judge'] = Judge
+        flu_related_data = move_in_place[move_in_place.Judge==1]
+        destination = [i[1] for i in flu_related_data.pairs]
+        count.append(destination.count(location))
+    ts = pd.Series(count,index = weeks)
+    return ts
+
+
+
+def GetActuallDayInWeek(week_user_flu_state):
+    weeks = sorted(week_user_flu_state.keys())
+    actual_day = []
+    for w in weeks:
+        actual_day.append(week_user_flu_state[w][1])
+    ts = pd.Series(actual_day,index=weeks)
+    return ts
+        
+'''
+tt = GetFluRelatedTwitterInPlaceLoc(Data,'Queensland','Brisbane')
+t = GetTwitterInPlaceLoc(Data,'Queensland','Brisbane')
+a = GetMoveDestinationInPlaceLoc(week_move,'Queensland','Brisbane')    
+b = GetFluRelatedMoveDestinationInPlaceLoc(week_move,week_user_flu_state,'Queensland','Brisbane')
+(tt*2000).plot()    
+t.shift(-1).plot()
+(a*20).plot()
+(b.shift(-1)*2000).plot()
+'''
+    

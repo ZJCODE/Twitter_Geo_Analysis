@@ -6,7 +6,7 @@ Created on Sun Oct 30 18:10:28 2016
 """
 
 import pandas as pd
-from GetData import getData,AddPos
+from GetData import GetData,AddPos
 import matplotlib.pyplot as plt
 import numpy as np
 import time
@@ -162,7 +162,7 @@ def AggMoveListByTime(move_list,way = 'week'):
 
     
 def main():
-    Data = getData()
+    Data = GetData()
     Data = AddPos(Data)
     AddDate(Data)
     
@@ -181,7 +181,7 @@ def main():
 
 
     
-'''    
+'''  
 if __name__ == '__main__':
     main() 
 '''

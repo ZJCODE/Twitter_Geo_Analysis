@@ -1,4 +1,4 @@
-import pandas as pd
+
 
 def AddDate(Data):
     d = [d.date() for d in Data.created_at]
@@ -59,6 +59,7 @@ def AddJudgeFlu(Data):
 
 
 def GenerateDate(year,month,day):
+    import pandas as pd
     return pd.datetime(year,month,day).date()
 
 def MapLocation(location,place):
