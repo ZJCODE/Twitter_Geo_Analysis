@@ -7,6 +7,7 @@ Created on Sun Nov  6 17:25:22 2016
 import psycopg2 as db
 import pandas as pd
 import numpy as np
+from twitter_function import Save_Obj,AddUserName,AddDate,AddJudgeFlu
 
 def GetDataText():
     
@@ -28,69 +29,11 @@ def GetDataText():
     data_text = pd.DataFrame(X,columns=['uid','text','created_at'])
     return data_text
 
-def Import_Obj(File):    
-    import pickle
-    File_Name = File+'.pkl'
-    pkl_file = open(File_Name, 'rb')
-    return  pickle.load(pkl_file)
-    
-
-def AddUserName(Data):
-    id_name_dict = Import_Obj('./Data/IdNameDict')
-    user_name = [id_name_dict[Id] for Id in Data.uid]
-    Data['user_name'] = user_name
-    
-def AddDate(Data):
-    d = [d.date() for d in Data.created_at]
-    Data['date'] = d
-
-def JudegFlu(text):  # Need to be improved
-    '''
-    input one text
-    return 0 : not flu related ,1 : flu related
-    '''
-    text =text.lower()    
-
-    def WordsIn(words,sentence):
-        for w in words:
-            if w in sentence:
-                pass
-            else:
-                return False
-        return True
-    
-    flu_words = ['influenza','flu','fever',
-    'cough',('sore' ,'throat'),('catch','cold'),('sick','cold'),('week','cold'),
-    'infect',('cold','ill'),('cold','illness'),('viruses','cold'),('vaccine','cold'),
-    ('cold','hospital'),('cold','headache'),('runny','nose'),('cold','medicine'),
-    ('cold','infections')]
-    
-    text2words = text.strip().split(' ')
-    
-    for fw in flu_words:
-        if isinstance(fw,tuple):
-            if WordsIn(fw,text2words):
-                #print 'tuple'
-                #print text
-                return 1
-            else:
-                return 0
-        else:
-            if fw in text2words:
-                #print text
-                return 1
-            else:
-                0
-                
-def AddJudgeFlu(Data):
-    Judge = [JudegFlu(text) for text in Data.text]
-    Data['Judge'] = Judge    
-
-
-def UserFluStataByTime(data_text,way = 'week'):    
+def UserFluStateByTime(data_text,way = 'week'):    
     AddDate(data_text)
     AddUserName(data_text)
     AddJudgeFlu(data_text)
+    #data_text['Judge'] = np.ones(len(data_text))
     from datetime import timedelta
     data_text = data_text.sort_values(['date','user_name'])
     if way == 'week':
@@ -102,16 +45,16 @@ def UserFluStataByTime(data_text,way = 'week'):
             date_start = min_day + timedelta(7-min_day.weekday())
         day_7 = timedelta(7)
         date_end = date_start + day_7
-        t = [date_start + timedelta(1)]
+        t = [date_start]
         flu_user = []
         actual_day = [] # how many days in that week
         for i in range((max(days) - min(days)).days/7):
             print str(i+1) + ' Week Finished'
-            data = data_text[(data_text.date > date_start)&(data_text.date <= date_end)]
+            data = data_text[(data_text.date >= date_start)&(data_text.date < date_end)]
             actual_day.append(len(set(data.date)))
             flu_data = data[data.Judge == 1]
             flu_user.append(list(set(flu_data.user_name)))  # Counter 
-            t.append(date_start + timedelta(1))
+            t.append(date_start)
             date_start = date_end
             date_end = date_start + day_7
         flu_user_and_days = zip(flu_user,actual_day)  # some day missing
@@ -145,7 +88,7 @@ def UserFluStataByTime(data_text,way = 'week'):
    
 
 data_text = GetDataText()
-week_user_flu_state = UserFluStataByTime(data_text,'week')
+week_user_flu_state = UserFluStateByTime(data_text,'week')
 Save_Obj(week_user_flu_state,'week_user_flu_state')
      
         

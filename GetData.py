@@ -2,7 +2,7 @@ import psycopg2 as db
 import numpy as np
 import pandas as pd
 
-def getData(with_geo_tag = True):
+def GetData(with_geo_tag = True):
     
     conn = db.connect("host=localhost dbname=aussie_twitter user=postgres password=dbzjun client_encoding='utf-8'")
     # conn.set_character_set('utf8')
@@ -66,13 +66,23 @@ def getIdNameDict():
     IdNameDict = dict(IdNameList)
     return IdNameDict
 
-#PosData = pd.read_csv('./Data/PosData.csv')
 
-def AddPos(Data,PosData):
+def AddPos(Data):
+    PosData = pd.read_csv('./Data/PosData.csv')
     Data['Location'] = PosData.Location
     Data['District'] = PosData.District
     Data = Data.dropna(how='any')
     location_name = [loc+','+dis for loc,dis in zip(Data.Location,Data.District)]
     Data['location_name'] = location_name
+    return Data
     
+
+from twitter_function import AddDate,AddUserName        
         
+def LoadData():
+    Data = GetData()
+    Data = AddPos(Data)
+    AddDate(Data)
+    AddUserName(Data)
+    return Data
+    

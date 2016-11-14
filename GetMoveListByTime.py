@@ -6,39 +6,16 @@ Created on Sun Oct 30 18:10:28 2016
 """
 
 import pandas as pd
-from GetData import getData
+from GetData import getData,AddPos
 import matplotlib.pyplot as plt
 import numpy as np
 import time
 from datetime import timedelta
+from collections import Counter
+from twitter_function import Import_Obj,Save_Obj,Sort_Dict,AddUserName,AddDate,GenerateDate,Sort_Dict_key
 
-def Import_Obj(File):    
-    import pickle
-    File_Name = File+'.pkl'
-    pkl_file = open(File_Name, 'rb')
-    return  pickle.load(pkl_file)
     
-
-def Save_Obj(Obj,File_Name):    
-    import pickle
-    File = File_Name + '.pkl'
-    output = open(File, 'wb')
-    pickle.dump(Obj, output)
-    output.close()    
-
-def Sort_Dict(Diction):
-    L = list(Diction.items())
-    Sort_L = sorted(L,key = lambda x:x[1] , reverse= True)
-    return Sort_L
-    
-def AddUserName(Data):
-    id_name_dict = Import_Obj('./Data/IdNameDict')
-    user_name = [id_name_dict[Id] for Id in Data.uid]
-    Data['user_name'] = user_name
-    
-def AddDate(Data):
-    d = [d.date() for d in Data.created_at]
-    Data['date'] = d
+   
     
 def GetUserData(Data,user_name):
     return Data[Data.user_name == user_name]
@@ -122,18 +99,12 @@ def GetAllMove_FasterVersion(Data):
     move_list.sort(key= lambda x : x[1])     
     df_move_list = pd.DataFrame(move_list,columns = ['pair','time'])
     return df_move_list
-            
-            
 
         
 def DrawTrack(u_data):
     position_list = np.c_[u_data.latitude.values,u_data.longitude.values]
     plt.plot(position_list[:,0],position_list[:,1],'g-',alpha=0.7)
-    
-    
-    
-def GenerateDate(year,month,day):
-    return pd.datetime(year,month,day).date()
+        
     
 def GetDateData(Data,date):
     return Data[Data.date == date]
@@ -156,12 +127,12 @@ def AggMoveListByTime(move_list,way = 'week'):
             date_start = min_day + timedelta(7-min_day.weekday())
         day_7 = timedelta(7)
         date_end = date_start + day_7
-        t = [date_start + timedelta(1)]
+        t = [date_start]
         pairs = []
         for i in range((max(days) - min(days)).days/7):
             print str(i+1) + ' Week Finished'
-            pairs.append(list(move_list[(move_list.time > date_start)&(move_list.time <= date_end)].pair.values))
-            t.append(date_start + timedelta(1))
+            pairs.append(list(move_list[(move_list.time >= date_start)&(move_list.time < date_end)].pair.values))
+            t.append(date_start)
             date_start = date_end
             date_end = date_start + day_7   
             
@@ -189,13 +160,17 @@ def AggMoveListByTime(move_list,way = 'week'):
 
 
 
-
     
 def main():
     Data = getData()
+    Data = AddPos(Data)
     AddDate(Data)
+    
+    # The amount of twitters
+    a = Sort_Dict(Counter(Data.date))   
+    plt.plot([i[0] for i in a],[i[1] for i in a])
+    
     AddUserName(Data) 
-    #move_list = DeleteMoveListException(GetAllMove_FasterVersion(Data))
     move_list = GetAllMove_FasterVersion(Data)
     day_m = AggMoveListByTime(move_list,way='day')
     week_m = AggMoveListByTime(move_list,way='week')
@@ -203,6 +178,8 @@ def main():
     Save_Obj(day_m,'./Data/day_move')
     Save_Obj(week_m,'./Data/week_move')
     Save_Obj(month_m,'./Data/month_move')
+
+
     
 '''    
 if __name__ == '__main__':
