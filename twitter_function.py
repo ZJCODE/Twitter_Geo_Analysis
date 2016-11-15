@@ -111,3 +111,9 @@ def Sort_Dict_key(Dictionary):
     L = list(Dictionary.items())
     Sort_L = sorted(L,key = lambda x:x[0] , reverse= False)
     return Sort_L
+    
+def GetPartOfTimeSeries(TS,TimeRange):
+    '''
+    Input [start_time,end_time]
+    '''
+    return TS[TimeRange[0]:TimeRange[1]]

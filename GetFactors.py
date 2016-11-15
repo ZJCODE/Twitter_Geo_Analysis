@@ -29,7 +29,7 @@ def GetTwitterInPlaceLoc(Data,place = None ,location = None):
     return ts_twitter_in_place_loc
 
 
-def GetFluRelatedTwitterInPlaceLoc(Data,place,location):
+def GetFluRelatedTwitterInPlaceLoc(Data,place=None,location=None):
     '''
     return timeseries
     '''
@@ -66,7 +66,7 @@ def GetMoveInPlace(Move,place):
     DfMove = DfMove[DfMove.same == 1][['pairs','user']]
     return DfMove
 
-def GetMoveDestinationInPlaceLoc(week_move,place,location):
+def GetMoveDestinationInPlaceLoc(week_move,place,location = None):
     '''
     return timeseries
     '''   
@@ -76,14 +76,17 @@ def GetMoveDestinationInPlaceLoc(week_move,place,location):
         move = week_move[w]
         move_in_place = GetMoveInPlace(move,place)
         destination = [i[1] for i in move_in_place.pairs]
-        count.append(destination.count(location))
+        if location != None:            
+            count.append(destination.count(location))
+        else:
+            count.append(len(destination))
     ts = pd.Series(count,index = weeks)
     return ts
         
 
     
 
-def GetFluRelatedMoveDestinationInPlaceLoc(week_move,week_user_flu_state,place,location):
+def GetFluRelatedMoveDestinationInPlaceLoc(week_move,week_user_flu_state,place,location=None):
     '''
     return timeseries
     '''
@@ -98,7 +101,10 @@ def GetFluRelatedMoveDestinationInPlaceLoc(week_move,week_user_flu_state,place,l
         move_in_place['Judge'] = Judge
         flu_related_data = move_in_place[move_in_place.Judge==1]
         destination = [i[1] for i in flu_related_data.pairs]
-        count.append(destination.count(location))
+        if location != None:            
+            count.append(destination.count(location))
+        else:
+            count.append(len(destination))
     ts = pd.Series(count,index = weeks)
     return ts
 
