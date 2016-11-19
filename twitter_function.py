@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def AddDate(Data):
     d = [d.date() for d in Data.created_at]
@@ -64,6 +64,7 @@ def GenerateDate(year,month,day):
 
 def MapLocation(location,place):
     if place == 'Queensland':
+        
         hhs_loc = ['Cairns', 'Townsville', 'Mackay', 'Fitzroy', 'Wide Bay',
            'Sunshine Coast', 'Brisbane', 'Darling Downs', 'Moreton',
            'Gold Coast']
@@ -72,8 +73,11 @@ def MapLocation(location,place):
             location = 'Brisbane'
         if location.startswith('Moreton'):
             location = 'Moreton'
+        if location.startswith('Darling'):
+            location = 'Darling Downs'    
         
         if location not in hhs_loc:
+            #print 'not in hhs'
             return None
         else:        
             return location

@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from datetime import timedelta
 from twitter_function import MapLocation,AddJudgeFlu,GenerateDate
+from collections import Counter
 
     
 
@@ -40,7 +41,7 @@ def GetFluRelatedTwitterInPlaceLoc(Data,place=None,location=None):
         Data = Data[Data.Location == location]
     
     Data = AddJudgeFlu(Data)
-    
+
     print 'Flu Added'
     ts = pd.Series(Data.Judge.values,index=Data.created_at.values)
     week_ts = ts.resample('W-SUN',how='sum')
@@ -82,8 +83,34 @@ def GetMoveDestinationInPlaceLoc(week_move,place,location = None):
             count.append(len(destination))
     ts = pd.Series(count,index = weeks)
     return ts
-        
 
+
+def GetWhere2WhereMatrix(count_where_to_where):
+
+    hhs_loc = ['Cairns', 'Townsville', 'Mackay', 'Fitzroy', 'Wide Bay',
+   'Sunshine Coast', 'Brisbane', 'Darling Downs', 'Moreton',
+   'Gold Coast']
+    where_to_where_matrix = np.zeros([len(hhs_loc),len(hhs_loc)])  
+    for i,loc1 in enumerate(hhs_loc):
+        for j,loc2 in enumerate(hhs_loc):
+            where_to_where_matrix[i,j] += count_where_to_where[(loc1,loc2)]
+    df_where_to_where = pd.DataFrame(where_to_where_matrix,index = hhs_loc,columns = hhs_loc)
+    return df_where_to_where
+        
+def GetMoveInPlaceWhere2Where(week_move,place):
+    '''
+    return a series of dataframe
+    ''' 
+    weeks = sorted(week_move.keys())
+    where_to_where = []
+    for w in weeks:
+        move = week_move[w]
+        move_in_place = GetMoveInPlace(move,place)
+        count_where_to_where = Counter(move_in_place.pairs)
+        where_to_where.append(GetWhere2WhereMatrix(count_where_to_where))
+
+    ts = pd.Series(where_to_where,index = weeks)
+    return ts
     
 
 def GetFluRelatedMoveDestinationInPlaceLoc(week_move,week_user_flu_state,place,location=None):
@@ -109,6 +136,26 @@ def GetFluRelatedMoveDestinationInPlaceLoc(week_move,week_user_flu_state,place,l
     return ts
 
 
+def GetFluRelatedMoveInPlaceWhere2Where(week_move,week_user_flu_state,place):
+    '''
+    return a series of dataframe
+    '''  
+    weeks = sorted(week_move.keys())
+    where_to_where = []
+    for w in weeks:
+        move = week_move[w]
+        move_in_place = GetMoveInPlace(move,place)
+        flu_state = week_user_flu_state[w]
+        flu_users = flu_state[0]
+        Judge = [1 if user in flu_users else 0 for user in move_in_place.user]
+        move_in_place['Judge'] = Judge
+        flu_related_data = move_in_place[move_in_place.Judge==1]
+        count_where_to_where = Counter(flu_related_data.pairs)
+        where_to_where.append(GetWhere2WhereMatrix(count_where_to_where))
+
+    ts = pd.Series(where_to_where,index = weeks)
+    return ts
+
 
 def GetActuallDayInWeek(week_user_flu_state):
     weeks = sorted(week_user_flu_state.keys())
@@ -117,15 +164,5 @@ def GetActuallDayInWeek(week_user_flu_state):
         actual_day.append(week_user_flu_state[w][1])
     ts = pd.Series(actual_day,index=weeks)
     return ts
-        
-'''
-tt = GetFluRelatedTwitterInPlaceLoc(Data,'Queensland','Brisbane')
-t = GetTwitterInPlaceLoc(Data,'Queensland','Brisbane')
-a = GetMoveDestinationInPlaceLoc(week_move,'Queensland','Brisbane')    
-b = GetFluRelatedMoveDestinationInPlaceLoc(week_move,week_user_flu_state,'Queensland','Brisbane')
-(tt*2000).plot()    
-t.shift(-1).plot()
-(a*20).plot()
-(b.shift(-1)*2000).plot()
-'''
+
     
