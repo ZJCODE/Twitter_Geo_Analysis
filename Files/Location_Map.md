@@ -74,7 +74,7 @@ Townsville -> Townsville
 Mackay -> Mackay
 Wide Bay -> Wide Bay
 Sunshine Coast -> Sunshine Coast
-Darling Downs -> Darling Downs
+Darling Downs - Maranoa -> Darling Downs
 Gold Coast -> Gold Coast
 Central Queensland -> Fitzroy
 ```

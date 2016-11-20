@@ -66,6 +66,8 @@ def GetMoveInPlace(Move,place):
     DfMove['same'] = [0 if l[0]==l[1] else 1 for l in DfMove.pairs]
     DfMove = DfMove[DfMove.same == 1][['pairs','user']]
     return DfMove
+      
+    
 
 def GetMoveDestinationInPlaceLoc(week_move,place,location = None):
     '''
@@ -165,4 +167,5 @@ def GetActuallDayInWeek(week_user_flu_state):
     ts = pd.Series(actual_day,index=weeks)
     return ts
 
-    
+
+   
