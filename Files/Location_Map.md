@@ -79,3 +79,21 @@ Gold Coast -> Gold Coast
 Central Queensland -> Fitzroy
 ```
 
+
+
+| Cairns            | 147,993   |
+| ----------------- | --------- |
+| Townsville        | 180,333   |
+| Mackay            | 85,455    |
+| Fitzroy  [Delete] |           |
+| Wide Bay          |           |
+| Sunshine Coast    | 302,122   |
+| Brisbane          | 2,209,453 |
+| Darling Downs     |           |
+| Moreton           |           |
+| Gold Coast        | 624,918   |
+
+http://blog.id.com.au/2016/population/australian-population/latest-population-figures-top-50-largest-cities-and-towns-in-australia/
+
+http://home.id.com.au/demographic-resources/community-profiles/?submissionGuid=379a6ac2-22c1-4e09-bd2d-fed22d3216e4
+

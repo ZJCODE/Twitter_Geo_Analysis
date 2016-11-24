@@ -19,9 +19,6 @@ df_flu_where_to_where = Import_Obj('./DF_Result/df_flu_where_to_where')
 
 
 
-
-    
-    
 def GetTransferProbability(df_where_to_where,df_twitter_in_place_loc):
     
     all_where_to_where = df_where_to_where.values[0]*0 
