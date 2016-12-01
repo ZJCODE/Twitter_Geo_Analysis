@@ -37,20 +37,20 @@ def GetTransferProbability(df_where_to_where,df_twitter_in_place_loc):
         all_where_to_where_with_stay.loc[loc,loc] = num_stay[loc]
     
     
-    all_where_to_where_T = all_where_to_where.T  # [i,j]  j to i
+   
     
-    P = (all_where_to_where_T / all_where_to_where_T.sum()).T # [i,j]  i to j
-    
-    
+    P = all_where_to_where / all_where_to_where.sum()
     
     
-    all_where_to_where_with_stay_T = all_where_to_where_with_stay.T  # [i,j]  j to i
     
-    P_with_stay = (all_where_to_where_with_stay_T / all_where_to_where_with_stay_T.sum()).T # [i,j]  i to j
+    
+    
+    
+    P_with_stay = all_where_to_where_with_stay / all_where_to_where_with_stay.sum()
 
     return P,P_with_stay
     
-    
+
     
 '''    
     
